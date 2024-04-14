@@ -1,13 +1,8 @@
 const express=require('express');
 const app = express();
-//const bodyParser = require('body-parser');
 const port=process.env.PORT||3000;
 
-// parse application/x-www-form-urlencoded
-//app.use(bodyParser.urlencoded({ extended: false }));
 
-// parse application/json
-//app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(express.urlencoded());
@@ -28,7 +23,7 @@ app.use(express.static('public'));
 })*/
 
 app.get('/registers_html',  (req, res) => {
-  res.sendFile(__dirname + 'public/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 
 })
 
@@ -42,7 +37,10 @@ app.post('/formPost',  async(req, res) => {
 
     }
   )
-  res.send(result);
+  res.sendFile(__dirname + '/public/thanks.html');
+
+
+
   
 })
 /*app.post('/users', async (req, res) => {
