@@ -1,12 +1,22 @@
 const express=require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const port=process.env.PORT||3000;
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(express.urlencoded());
+app.use(express.static('public'));
 
-app.get('/registers', async (req, res) => {
+/*app.get('/registers', async (req, res) => {
   // findOne
+
+
   let result = await client.db('registers').collection('users').findOne({
     username: req.body.username,
     password: req.body.password,
@@ -14,10 +24,28 @@ app.get('/registers', async (req, res) => {
 
 
   })
-  res.send(result)
+  res.send(result);
+})*/
+
+app.get('/registers_html',  (req, res) => {
+  res.sendFile(__dirname + 'public/index.html');
+
 })
 
-app.post('/users', async (req, res) => {
+app.post('/formPost',  async(req, res) => {
+ 
+  let result = await client.db('registers').collection('users').insertOne(
+    {
+      username: req.body.username,
+      password: req.body.password,
+      password_again:req.body.password_again,
+
+    }
+  )
+  res.send(result);
+  
+})
+/*app.post('/users', async (req, res) => {
   // console.log(req.body)
 
   let result = await client.db('registers').collection('users').insertOne(
@@ -29,7 +57,7 @@ app.post('/users', async (req, res) => {
     }
   )
   res.send(result)
-})
+})*/
 app.listen(port,()=>{
     console.log(`Server listening at http://localhost:${port}`);
 });
