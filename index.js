@@ -22,14 +22,14 @@ app.use(express.static('public'));
   res.send(result);
 })*/
 
-app.get('/registers_html',  (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+app.get('/',  (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
 
 })
 
 app.post('/formPost',  async(req, res) => {
  
-  let result = await client.db('registers').collection('users').insertOne(
+  let result = await client.db('registers').collection('users').insertOne(//
     {
       username: req.body.username,
       password: req.body.password,
@@ -38,6 +38,8 @@ app.post('/formPost',  async(req, res) => {
     }
   )
   res.sendFile(__dirname + '/public/thanks.html');
+  res.send(result);
+  console.log(req.body);
 
 
 
@@ -56,6 +58,25 @@ app.post('/formPost',  async(req, res) => {
   )
   res.send(result)
 })*/
+app.post('/login', async (req, res) => {
+  // Get the username and password from the request body
+ 
+  const { username, password, } = req.body;
+
+  // Find the user in the database
+  let user = await client.db('registers').collection('users').findOne({ username });
+
+  // If the user doesn't exist or the password is incorrect, send an error response
+  if (!user || user.password !== password) {
+    res.send.prompt('Login failed. Please try again.')
+    res.sendFile(__dirname + '/public/index.html');
+    
+    return;
+  }
+  else
+  // If the username and password are correct, send a success response
+  res.send('Login successful');
+});
 app.listen(port,()=>{
     console.log(`Server listening at http://localhost:${port}`);
 });
