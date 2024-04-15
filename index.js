@@ -8,28 +8,15 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.static('public'));
 
-/*app.get('/registers', async (req, res) => {
-  // findOne
-
-
-  let result = await client.db('registers').collection('users').findOne({
-    username: req.body.username,
-    password: req.body.password,
-    password_again: req.body.password_again,
-
-
-  })
-  res.send(result);
-})*/
 
 app.get('/',  (req, res) => {
-  res.sendFile(__dirname + '/public/login.html');
+  res.sendFile(__dirname + 'public/index.html');
 
 })
 
-app.post('/formPost',  async(req, res) => {
+app.post('/registers',  async(req, res) => {
  
-  let result = await client.db('registers').collection('users').insertOne(//
+  let result = await client.db('registerss').collection('userss').insertOne(//
     {
       username: req.body.username,
       password: req.body.password,
@@ -38,7 +25,7 @@ app.post('/formPost',  async(req, res) => {
     }
   )
   res.sendFile(__dirname + '/public/thanks.html');
-  res.send(result);
+  console.log(result);
   console.log(req.body);
 
 
@@ -64,12 +51,13 @@ app.post('/login', async (req, res) => {
   const { username, password, } = req.body;
 
   // Find the user in the database
-  let user = await client.db('registers').collection('users').findOne({ username });
+  let user = await client.db('registerss').collection('userss').findOne(
+    { username,password });
 
   // If the user doesn't exist or the password is incorrect, send an error response
   if (!user || user.password !== password) {
-    res.send.prompt('Login failed. Please try again.')
-    res.sendFile(__dirname + '/public/index.html');
+   // res.send.('Login failed. Please try again.')
+    res.sendFile(__dirname + '/public/login.html');
     
     return;
   }
