@@ -1,1 +1,2 @@
-window.alert('Password or username is incorrect!')
+window.alert("Password or user may wrong");
+    

@@ -1,5 +1,6 @@
 const express=require('express');
 const app = express();
+const bcrypt=require('bcrypt');
 const port=process.env.PORT||3000;
 
 
@@ -15,18 +16,27 @@ app.get('/',  (req, res) => {
 })
 
 app.post('/registers',  async(req, res) => {
- 
-  let result = await client.db('registerss').collection('userss').insertOne(//
-    {
-      username: req.body.username,
-      password: req.body.password,
-      password_again:req.body.password_again,
 
-    }
-  )
+  let NotNew = await client.db("registers").collection("users").findOne({ username: req.body.username });
+  if (NotNew) {
+    res.sendFile(__dirname + '/public/register.html');
+    console.log("Username already exists");
+  }
+  else {
+    const hash = bcrypt.hashSync(req.body.password, 10);
+    //insertOne()=insert a single document into a collection
+    let result = await client.db("registers").collection("users").insertOne(
+      {
+        username: req.body.username,
+        email: req.body.email,
+        password: hash
+
+      })
+
   res.sendFile(__dirname + '/public/thanks.html');
   console.log(result);
   console.log(req.body);
+}
 
 
 
@@ -46,24 +56,41 @@ app.post('/registers',  async(req, res) => {
   res.send(result)
 })*/
 app.post('/login', async (req, res) => {
-  // Get the username and password from the request body
- 
-  const { username, password, } = req.body;
-
-  // Find the user in the database
-  let user = await client.db('registerss').collection('userss').findOne(
-    { username,password });
-
+  let user = await client.db("registers").collection("users").findOne({ username: req.body.username });
   // If the user doesn't exist or the password is incorrect, send an error response
-  if (!user || user.password !== password) {
+  if (!req.body.username || !req.body.password) {
    // res.send.('Login failed. Please try again.')
     res.sendFile(__dirname + '/public/login.html');
     
     return;
   }
-  else
-  // If the username and password are correct, send a success response
-  res.send('Login successful');
+  else if (req.body.username != null && req.body.password != null) {
+
+    //step 2
+    let user = await client.db("registers").collection("users").findOne({ username: req.body.username });
+    if (user)//step 3
+    {
+      //user found,check whether password is correct
+      console.log(user);//found in database
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        //password is correct
+        res.status(200).send({
+          message: "Welcome " + user.username,
+          username: user.username,
+          password: user.password,
+        });
+      } // true
+      else {
+        res.sendFile(__dirname + '/public/login.html');
+        console.log("Password is incorrect");
+        //password is incorrect
+      }//false
+    }
+    else { //user not found
+      res.sendFile(__dirname + '/public/login.html');
+      console.log("User not found");
+    }
+  }
 });
 app.listen(port,()=>{
     console.log(`Server listening at http://localhost:${port}`);
@@ -71,7 +98,7 @@ app.listen(port,()=>{
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://brian_nogizaka:nogizakabrian@cluster2.pwcr3rq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster2";// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const uri = "mongodb+srv://brian_nogizaka:20010808@cluster2.pwcr3rq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster2";// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
